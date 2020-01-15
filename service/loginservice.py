@@ -28,4 +28,14 @@ def login(usrobj):
         conn.close_con()
         return True
     else:
-        return result.get("msg"), result.get("re_code"),
+        return result.get("msg"), result.get("re_code")
+
+
+def getUsrTuples():
+    """
+    获取当前用户的workerid和usrname元组
+    :return:
+    """
+    conn = ConnectSqlite()
+    ut = conn.fetchall_table("SELECT WORKER_ID, WORKER_NAME FROM CUR_USER ORDER BY ID DESC", False)
+    return ut

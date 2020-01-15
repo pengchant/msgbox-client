@@ -5,12 +5,15 @@ from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtWidgets import QWidget, QApplication, QAction, qApp, QMainWindow, QVBoxLayout, QLabel, QHBoxLayout, \
     QScrollArea, QTreeWidget, QTreeWidgetItem, QMessageBox
 
+from service.loginservice import getUsrTuples
+
 
 class ClientForm(QMainWindow):
     """主页面"""
 
     def __init__(self):
         super().__init__()
+        self.cur_user_t = ('', '')  # 当前用户的工号和姓名
         self.initUI()
 
     def initUI(self):
@@ -43,18 +46,17 @@ class ClientForm(QMainWindow):
 
         # 创建用户头像
         pixmap = QPixmap("static/usr.png")
-        # scaredPixmap = pixmap.scaled(80, 80, Qt.KeepAspectRatio)
         label = QLabel(self)
         label.setPixmap(pixmap)
         hbox_user.addWidget(label, 1)
 
         # 用户信息
         uvbox = QVBoxLayout()
-        usrname = "陈鹏"
-        lbl_usrname = QLabel("%s, %s好" % (usrname, "下午"))
-        lbl_usrname.setFont(QFont("Microsoft YaHei"))
-        lbl_usrname.setStyleSheet("margin-left:10px")
-        uvbox.addWidget(lbl_usrname)
+        usrname = self.cur_user_t[1] if self.cur_user_t is not None else "暂无"
+        self.lbl_usrname = QLabel("%s, %s好" % (usrname, "下午"))
+        self.lbl_usrname.setFont(QFont("Microsoft YaHei"))
+        self.lbl_usrname.setStyleSheet("margin-left:10px")
+        uvbox.addWidget(self.lbl_usrname)
 
         # 消息logo
         msg_logo_num = QWidget()
@@ -88,8 +90,6 @@ class ClientForm(QMainWindow):
 
         # 在此动态添加内容
         self.createmsg_list(msglist_widget)
-
-
 
     def create_menu(self):
         """
@@ -255,8 +255,21 @@ class ClientForm(QMainWindow):
             item = self.tree.currentItem()  # 获取当前选中的节点
             print("key= %s, vlaue= %s" % (item.text(0), item.text(1)))
 
+    def do_fetch_data(self):
+        """
+        加载后台数据
+        :return:
+        """
+        self.cur_user_t = getUsrTuples()
+        print(self.cur_user_t)
 
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     ex = ClientForm()
-#     sys.exit(app.exec_())
+    def showEvent(self, *args, **kwargs):
+        """
+        显示
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        print("show...")
+        self.do_fetch_data()
+        self.lbl_usrname.setText("%s, %s好" % (self.cur_user_t[1], "下午"))
