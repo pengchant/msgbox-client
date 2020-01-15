@@ -21,7 +21,7 @@ sys.path.append("..")
 
 class ConnectSqlite:
 
-    def __init__(self, dbName="cssrcmsg.db"):
+    def __init__(self, dbName="./cssrcmsgbox.db"):
         """
         初始化连接--使用完记得关闭连接
         :param dbName: 连接库名字，注意，以'.db'结尾
@@ -103,14 +103,14 @@ class ConnectSqlite:
         except Exception as e:
             print(self._time_now, "[SELECT TABLE ERROR]", e)
 
-    def insert_update_table(self, sql):
+    def insert_update_table(self, sql, args):
         """
         插入/更新表记录
         :param sql:
         :return:
         """
         try:
-            self._cur.execute(sql)
+            self._cur.execute(sql, args)
             self._conn.commit()
             return True
         except Exception as e:
@@ -131,3 +131,33 @@ class ConnectSqlite:
         except Exception as e:
             print(self._time_now, "[INSERT MANY TABLE ERROR]", e)
             return False
+
+    def do_db_init(self):
+        """
+        初始化数据库
+        :return:
+        """
+        init_sql = '''
+        DROP TABLE IF EXISTS CUR_USER; 
+        CREATE TABLE CUR_USER(
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        WORKER_ID CHAR(100) NOT NULL,
+        WORKER_NAME CHAR(100) NOT NULL, 
+        TOKEN TEXT NOT NULL,
+        LAST_LOGIN_TIME DATETIME
+        );
+
+        DROP TABLE IF EXISTS REMOTE_SERVER;
+        CREATE TABLE REMOTE_SERVER(
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        IP CHAR(100),
+        PORT CHAR(50),
+        BASE_URL CHAR(500),
+        SOCKET_BASE_URL CHAR(500)
+        );
+        INSERT INTO REMOTE_SERVER(IP, PORT, BASE_URL, SOCKET_BASE_URL) VALUES('127.0.0.1', '5000', 'http://127.0.0.1:5000', '/websocket/user_refresh')
+        '''
+        self._cur.executescript(init_sql)
+        self._conn.commit()
+        print(">>>初始化数据库完成>>>")
+

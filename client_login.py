@@ -1,12 +1,12 @@
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QPainter, QColor, QFont, QIcon
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication, QLabel, QDesktopWidget, QHBoxLayout, QFormLayout, \
-    QPushButton, QLineEdit
+from PyQt5.QtGui import QPixmap, QFont, QIcon
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QDesktopWidget, QHBoxLayout, QFormLayout, \
+    QPushButton, QLineEdit, QMessageBox
 
 from client import ClientForm
-from db.migrate import do_db_init
+from db.dbHelper import ConnectSqlite
 from service.loginservice import login
 from utils.config import BasesConfig
 
@@ -109,14 +109,22 @@ class LoginForm(QWidget):
             "password": self.led_pwd.text()
         }
         print(usrobj)
-        login(usrobj)
-        # MainClient.show()
-        # self.close()
+        result = login(usrobj)
+        if result is True:
+            MainClient.show()
+            self.close()
+        else:
+            QMessageBox.warning(self,
+                                "提示",
+                                "%s" % result[0],
+                                QMessageBox.Yes | QMessageBox.No)
 
 
 if __name__ == "__main__":
-    do_db_init()  # 初始化数据库
-    BasesConfig.init_config()  # 初始化系统配置
+    conn = ConnectSqlite()
+    conn.do_db_init()
+    conn.close_con()
+    BasesConfig.init_config()
     app = QApplication(sys.argv)
     ex = LoginForm()
     MainClient = ClientForm()
