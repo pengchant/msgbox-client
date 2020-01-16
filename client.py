@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QApplication, QAction, qApp, QMainWindow, Q
     QScrollArea, QTreeWidget, QTreeWidgetItem, QMessageBox
 
 from service.loginservice import getUsrTuples
+from service.rendertree import TreeRenderThread, ChatNamespace
 
 
 class ClientForm(QMainWindow):
@@ -13,6 +14,7 @@ class ClientForm(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.init = 0  # 0 代表初始情况，需要建立websocket连接,其他不用
         self.cur_user_t = ('', '')  # 当前用户的工号和姓名
         self.initUI()
 
@@ -83,13 +85,13 @@ class ClientForm(QMainWindow):
             "#%s{border:1px solid #e1e2e2;border-left:none;border-right:none;padding-left:20px;}" % "unread_label")
         unread_label.setGeometry(0, 105, 400, 50)
         # 消息列表具体内容
-        msglist_widget = QWidget(self)
-        msglist_widget.setGeometry(0, 155, 400, 580)
-        msglist_widget.setObjectName("msglist")
-        msglist_widget.setStyleSheet("#msglist{border:1px solid red}")
+        self.msglist_widget = QWidget(self)
+        self.msglist_widget.setGeometry(0, 155, 400, 580)
+        self.msglist_widget.setObjectName("msglist")
+        self.msglist_widget.setStyleSheet("#msglist{border:1px solid red}")
 
         # 在此动态添加内容
-        self.createmsg_list(msglist_widget)
+        # self.createmsg_list(self.msglist_widget)
 
     def create_menu(self):
         """
@@ -179,70 +181,13 @@ class ClientForm(QMainWindow):
         """
         print("关于系统")
 
-    def createmsg_list(self, parent):
+    def do_fetch_data(self):
         """
-        添加信息列表
+        加载用户数据
         :return:
         """
-        self.tree = QTreeWidget(parent)  # 创建tree组件
-        # 设置列数
-        self.tree.setColumnCount(2)  # 设置列数
-        # 设置树形控件的头部标题
-        self.tree.setHeaderLabels(["消息描述", "推送时间"])  # 给treeview设置标题
-
-        # 设置根节点
-        root = QTreeWidgetItem(self.tree)  # 设置根节点
-        root.setText(0, "cssrc消息盒子(未读消息)")  # 设置根节点的名字
-        root.setIcon(0, QIcon("static/msg.png"))  # 设置 根节点的图片
-
-        # 设置属性控件列的宽度
-        self.tree.setColumnWidth(0, 280)
-        self.tree.setColumnWidth(1, 80)
-
-        # 设置子节点
-        for i in range(10):
-            child = QTreeWidgetItem()
-            child.setText(0, "数值船海系统" + str(i + 1))
-            child.setText(1, "")
-            child.setIcon(0, QIcon("static/msg.png"))
-            # 添加子节点
-            root.addChild(child)
-            # 添加二级节点
-            for j in range(2):
-                sec_child = QTreeWidgetItem(child)
-                sec_child.setText(0, "人力资源管理系统" + str(i + 1))
-                curr = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-                sec_child.setText(1, curr)
-                sec_child.setIcon(0, QIcon("static/msg.png"))
-
-        # todo设置节点的状态
-        child2 = QTreeWidgetItem(root)
-        child2.setText(0, "人力资源管理系统")
-        child2.setText(1, "")
-        child2.setIcon(0, QIcon("static/msg.png"))
-
-        # 设置cihld2的子节点
-        child3 = QTreeWidgetItem(child2)
-        child3.setText(0, "你的app上线了..")
-        child3.setText(1, "昨天")
-        child3.setIcon(0, QIcon("static/msg.png"))
-
-        child4 = QTreeWidgetItem(child2)
-        child4.setText(0, "修改密码成功..")
-        child4.setText(1, "昨天")
-        child4.setIcon(0, QIcon("static/msg.png"))
-
-        # 加载根节点的所有属性 与子控件
-        self.tree.addTopLevelItem(root)
-
-        # 给节点点击添加响应事件
-        self.tree.clicked.connect(self.onClicked)
-
-        # 节点全部展开看
-        self.tree.expandAll()
-
-        # 添加到父容器中设置位置
-        self.tree.setGeometry(0, 0, 400, 580)
+        self.cur_user_t = getUsrTuples()
+        print(self.cur_user_t)
 
     def onClicked(self, index):
         """
@@ -255,21 +200,23 @@ class ClientForm(QMainWindow):
             item = self.tree.currentItem()  # 获取当前选中的节点
             print("key= %s, vlaue= %s" % (item.text(0), item.text(1)))
 
-    def do_fetch_data(self):
-        """
-        加载后台数据
-        :return:
-        """
-        self.cur_user_t = getUsrTuples()
-        print(self.cur_user_t)
-
     def showEvent(self, *args, **kwargs):
         """
         显示
+        1.建立socket连接
+        2.加载数据
+        3.绑定数据
         :param args:
         :param kwargs:
         :return:
         """
-        print("show...")
-        self.do_fetch_data()
-        self.lbl_usrname.setText("%s, %s好" % (self.cur_user_t[1], "下午"))
+        if self.init == 0:  # 初次加载
+            print("show...")
+            self.do_fetch_data()
+            self.lbl_usrname.setText("%s, %s好" % (self.cur_user_t[1], "下午"))
+            self.init += 1  # 累加
+            # 建立socket连接,开启新线程自动刷新列表
+            ChatNamespace.ContainerWidget = self.msglist_widget
+            ChatNamespace.Parent = self
+            refresh_thread = TreeRenderThread(self.cur_user_t[0])  # 传递工号
+            refresh_thread.start()  # 开启新线程

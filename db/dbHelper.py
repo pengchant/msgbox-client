@@ -1,19 +1,8 @@
 #!/usr/bin/env python  
-# encoding: utf-8  
-""" 
-@version: v1.0 
-@author: W_H_J 
-@license: Apache Licence  
-@contact: 415900617@qq.com 
-@software: PyCharm 
-@file: SQLite3Config.py 
-@time: 2019/5/17 14:22 
-@describe: sqllit3 操作助手
-"""
-import sys
+# encoding: utf-8
 import os
 import sqlite3
-from datetime import datetime
+import sys
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/' + '..'))
 sys.path.append("..")
