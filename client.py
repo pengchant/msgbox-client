@@ -91,7 +91,15 @@ class ClientForm(QMainWindow):
         self.msglist_widget.setStyleSheet("#msglist{border:1px solid red}")
 
         # 在此动态添加内容
-        # self.createmsg_list(self.msglist_widget)
+        self.tree = QTreeWidget(self.msglist_widget)  # 创建tree组件
+        # 设置列数
+        self.tree.setColumnCount(2)  # 设置列数
+        # 设置树形控件的头部标题
+        self.tree.setHeaderLabels(["消息描述", "推送时间"])  # 给treeview设置标题
+
+        # 设置属性控件列的宽度
+        self.tree.setColumnWidth(0, 280)
+        self.tree.setColumnWidth(1, 80)
 
     def create_menu(self):
         """
@@ -219,4 +227,57 @@ class ClientForm(QMainWindow):
             ChatNamespace.ContainerWidget = self.msglist_widget
             ChatNamespace.Parent = self
             refresh_thread = TreeRenderThread(self.cur_user_t[0])  # 传递工号
+            refresh_thread.breakSignal.connect(self.createmsg_list)
             refresh_thread.start()  # 开启新线程
+
+    def createmsg_list(self, msg_info_data):
+        """
+        添加信息列表
+        :param msg_info_data:  消息列表
+        :return:
+        """
+        # 先清空root根下面的所有的历史消息
+        # if hasattr(self, 'root') and self.root is not None:
+        self.tree.clear()
+        # 设置根节点
+        self.root = QTreeWidgetItem(self.tree)  # 设置根节点
+        self.root.setText(0, "cssrc消息盒子(未读消息)")  # 设置根节点的名字
+        self.root.setIcon(0, QIcon("static/loc.png"))  # 设置 根节点的图片
+
+        try:
+            msg_list = msg_info_data.get('data').get('msgs')
+            sys_list = msg_info_data.get('data').get('sys')
+            for sys in sys_list:
+                child = QTreeWidgetItem()
+                child.setText(0, sys.get("sysname"))
+                child.setText(1, "")
+                child.setIcon(0, QIcon("static/app.png"))
+                # 添加到根节点上
+                self.root.addChild(child)
+                # 添加二级节点
+                for msg in msg_list:
+                    # 将该系统下的所有的消息加载到节点上
+                    if msg.get("from_sys") == sys.get("id"):
+                        sec_child = QTreeWidgetItem(child)
+                        sec_child.setText(0, msg.get("msg_title"))
+                        sec_child.setText(1, msg.get("msg_push_time"))
+                        sec_child.setIcon(0, QIcon("static/xx.png"))
+                        # 为子节点绑定事件
+        except Exception as e:
+            print("解析异常")
+
+        # 加载根节点的所有属性 与子控件
+        self.tree.addTopLevelItem(self.root)
+
+        # 给节点点击添加响应事件
+        try:
+            self.tree.clicked.disconnect(self.onClicked)  # 先取消绑定
+        except:
+            pass
+        self.tree.clicked.connect(self.onClicked)
+
+        # 节点全部展开看
+        self.tree.expandAll()
+
+        # 添加到父容器中设置位置
+        self.tree.setGeometry(0, 0, 400, 580)

@@ -1,0 +1,166 @@
+{
+  'data': {
+    'msgs': [
+      {
+        'from_sys': 2,
+        'id': 5,
+        'msg_push_time': '2020-01-16 06:53',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 6,
+        'msg_push_time': '2020-01-16 07:01',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 7,
+        'msg_push_time': '2020-01-16 07:02',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 8,
+        'msg_push_time': '2020-01-16 07:07',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 9,
+        'msg_push_time': '2020-01-16 07:07',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 10,
+        'msg_push_time': '2020-01-16 07:10',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 11,
+        'msg_push_time': '2020-01-16 07:10',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 12,
+        'msg_push_time': '2020-01-16 07:14',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 13,
+        'msg_push_time': '2020-01-16 07:19',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 14,
+        'msg_push_time': '2020-01-16 07:22',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 15,
+        'msg_push_time': '2020-01-16 07:25',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 17,
+        'msg_push_time': '2020-01-16 07:26',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 18,
+        'msg_push_time': '2020-01-16 07:32',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 19,
+        'msg_push_time': '2020-01-16 07:35',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 20,
+        'msg_push_time': '2020-01-16 07:35',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 21,
+        'msg_push_time': '2020-01-16 07:37',
+        'msg_title': '线上营销',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 2,
+        'id': 22,
+        'msg_push_time': '2020-01-16 07:37',
+        'msg_title': '这是测试啊。。。。',
+        'msg_url': 'http://192.168.8.44'
+      },
+      {
+        'from_sys': 5,
+        'id': 31,
+        'msg_push_time': '2020-01-16 16:38',
+        'msg_title': '测试测试',
+        'msg_url': 'http://192.168.8.51:8088/login.html'
+      },
+      {
+        'from_sys': 5,
+        'id': 32,
+        'msg_push_time': '2020-01-17 00:32',
+        'msg_title': '这是测试的描述',
+        'msg_url': 'http://192.168.8.51:8088/login.html'
+      }
+    ],
+    'sys': [
+      {
+        'id': 2,
+        'sysname': '数值船海系统'
+      },
+      {
+        'id': 3,
+        'sysname': '人力资源管理系统'
+      },
+      {
+        'id': 5,
+        'sysname': '航空航天实验管理系统'
+      },
+      {
+        'id': 6,
+        'sysname': '人力资源管理系统'
+      },
+      {
+        'id': 9,
+        'sysname': 'rtx通讯系统'
+      },
+      {
+        'id': 16,
+        'sysname': '党政会议管理系统'
+      }
+    ]
+  },
+  're_code': '0'
+}

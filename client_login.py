@@ -120,6 +120,7 @@ class LoginForm(QWidget):
                                 QMessageBox.Yes | QMessageBox.No)
 
 
+
 if __name__ == "__main__":
     conn = ConnectSqlite()
     conn.do_db_init()
