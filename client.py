@@ -1,10 +1,9 @@
-import time
-
-from PyQt5.QtCore import Qt
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtWidgets import QWidget, QApplication, QAction, qApp, QMainWindow, QVBoxLayout, QLabel, QHBoxLayout, \
-    QScrollArea, QTreeWidget, QTreeWidgetItem, QMessageBox
+    QTreeWidget, QTreeWidgetItem, QMessageBox
 
+from service.clientservice import update_msg_read
 from service.loginservice import getUsrTuples
 from service.rendertree import TreeRenderThread, ChatNamespace
 
@@ -93,10 +92,11 @@ class ClientForm(QMainWindow):
         # 在此动态添加内容
         self.tree = QTreeWidget(self.msglist_widget)  # 创建tree组件
         # 设置列数
-        self.tree.setColumnCount(2)  # 设置列数
+        self.tree.setColumnCount(3)  # 设置列数
         # 设置树形控件的头部标题
-        self.tree.setHeaderLabels(["消息描述", "推送时间"])  # 给treeview设置标题
-
+        self.tree.setHeaderLabels(["消息描述", "推送时间", "url"])  # 给treeview设置标题
+        # 设置隐藏
+        self.tree.setColumnHidden(2, True)
         # 设置属性控件列的宽度
         self.tree.setColumnWidth(0, 280)
         self.tree.setColumnWidth(1, 80)
@@ -203,10 +203,18 @@ class ClientForm(QMainWindow):
         :param index:
         :return:
         """
-        button = QMessageBox.warning(self, "提示", "是否前去查看?", QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Ok)
-        if button == QMessageBox.Ok:
-            item = self.tree.currentItem()  # 获取当前选中的节点
-            print("key= %s, vlaue= %s" % (item.text(0), item.text(1)))
+        item = self.tree.currentItem()  # 获取当前选中的节点
+        if item and item.text(2) != "":
+            button = QMessageBox.warning(self, "提示", "是否前去查看?", QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Ok)
+            if button == QMessageBox.Ok:  # 如果确定，就打开网页
+                param = item.text(2).split("|")
+                QtGui.QDesktopServices.openUrl(QtCore.QUrl(param[1]))
+                # 发起一个Http请求告知后端该消息已被查看
+                try:
+                    result = update_msg_read(param[0])
+                    print(result)
+                except:
+                    pass
 
     def showEvent(self, *args, **kwargs):
         """
@@ -237,7 +245,6 @@ class ClientForm(QMainWindow):
         :return:
         """
         # 先清空root根下面的所有的历史消息
-        # if hasattr(self, 'root') and self.root is not None:
         self.tree.clear()
         # 设置根节点
         self.root = QTreeWidgetItem(self.tree)  # 设置根节点
@@ -250,8 +257,9 @@ class ClientForm(QMainWindow):
             for sys in sys_list:
                 child = QTreeWidgetItem()
                 child.setText(0, sys.get("sysname"))
-                child.setText(1, "")
                 child.setIcon(0, QIcon("static/app.png"))
+                child.setText(1, "")
+                child.setText(2, "")
                 # 添加到根节点上
                 self.root.addChild(child)
                 # 添加二级节点
@@ -261,8 +269,8 @@ class ClientForm(QMainWindow):
                         sec_child = QTreeWidgetItem(child)
                         sec_child.setText(0, msg.get("msg_title"))
                         sec_child.setText(1, msg.get("msg_push_time"))
+                        sec_child.setText(2, str(msg.get("id")) + "|" + str(msg.get("msg_url")))
                         sec_child.setIcon(0, QIcon("static/xx.png"))
-                        # 为子节点绑定事件
         except Exception as e:
             print("解析异常")
 

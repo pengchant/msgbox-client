@@ -49,61 +49,6 @@ class ChatNamespace(BaseNamespace):
         print(result)
         ChatNamespace.RENDER_THREAD.breakSignal.emit(result)  # 通知主线程修改ui
 
-    #
-    # def createmsg_list(self, msg_info_data):
-    #     """
-    #     添加信息列表
-    #     :param msg_info_data:  消息列表
-    #     :return:
-    #     """
-    #     ChatNamespace.Parent.tree = QTreeWidget(ChatNamespace.Parent)  # 创建tree组件
-    #     # 设置列数
-    #     ChatNamespace.Parent.tree.setColumnCount(2)  # 设置列数
-    #     # 设置树形控件的头部标题
-    #     ChatNamespace.Parent.tree.setHeaderLabels(["消息描述", "推送时间"])  # 给treeview设置标题
-    #
-    #     # 设置根节点
-    #     root = QTreeWidgetItem(ChatNamespace.Parent.tree)  # 设置根节点
-    #     root.setText(0, "cssrc消息盒子(未读消息)")  # 设置根节点的名字
-    #     root.setIcon(0, QIcon("static/msg.png"))  # 设置 根节点的图片
-    #
-    #     # 设置属性控件列的宽度
-    #     ChatNamespace.Parent.tree.setColumnWidth(0, 280)
-    #     ChatNamespace.Parent.tree.setColumnWidth(1, 80)
-    #
-    #     try:
-    #         msg_list = msg_info_data.get('data').get('msgs')
-    #         sys_list = msg_info_data.get('data').get('sys')
-    #         for sys in sys_list:
-    #             child = QTreeWidgetItem()
-    #             child.setText(0, sys.get("sysname"))
-    #             child.setText(1, "")
-    #             child.setIcon(0, QIcon("static/msg.png"))
-    #             # 添加到根节点上
-    #             root.addChild(child)
-    #             # 添加二级节点
-    #             for msg in msg_list:
-    #                 # 将该系统下的所有的消息加载到节点上
-    #                 if msg.get("from_sys") == sys.get("id"):
-    #                     sec_child = QTreeWidgetItem(child)
-    #                     sec_child.setText(0, msg.get("msg_title"))
-    #                     sec_child.setText(1, msg.get("msg_push_time"))
-    #                     sec_child.setIcon(0, QIcon("static/msg.png"))
-    #     except Exception as e:
-    #         print("解析异常")
-    #
-    #     # 加载根节点的所有属性 与子控件
-    #     ChatNamespace.Parent.tree.addTopLevelItem(root)
-    #
-    #     # 给节点点击添加响应事件
-    #     ChatNamespace.Parent.tree.clicked.connect(ChatNamespace.Parent.onClicked)
-    #
-    #     # 节点全部展开看
-    #     ChatNamespace.Parent.tree.expandAll()
-    #
-    #     # 添加到父容器中设置位置
-    #     ChatNamespace.Parent.tree.setGeometry(0, 0, 400, 580)
-
 
 class TreeRenderThread(QThread):
     """节点树渲染的线程,同时负责与后台建立socket链接通信"""

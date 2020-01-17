@@ -22,6 +22,8 @@ class MyHttpHelper():
             # 获取token
             token = MyTokenManage.getToken()
             headers['Authorization'] = token
-        datas = json.dumps(data_json)
+        datas = None
+        if data_json:
+            datas = json.dumps(data_json)
         r = requests.post(url, data=datas, headers=headers)
         return json.loads(r.text)
