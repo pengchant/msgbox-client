@@ -1,3 +1,7 @@
+import sys, os
+if hasattr(sys, 'frozen'):
+    os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']
+
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtWidgets import QWidget, QApplication, QAction, qApp, QMainWindow, QVBoxLayout, QLabel, QHBoxLayout, \
@@ -6,6 +10,7 @@ from PyQt5.QtWidgets import QWidget, QApplication, QAction, qApp, QMainWindow, Q
 from service.clientservice import update_msg_read
 from service.loginservice import getUsrTuples
 from service.rendertree import TreeRenderThread, ChatNamespace
+from utils.date_util import MyDateInfoHelper
 
 
 class ClientForm(QMainWindow):
@@ -205,16 +210,20 @@ class ClientForm(QMainWindow):
         """
         item = self.tree.currentItem()  # 获取当前选中的节点
         if item and item.text(2) != "":
+            param = item.text(2).split("|")
+            if param is not None and param[2] != "WAITTING_READ":
+                QtGui.QDesktopServices.openUrl(QtCore.QUrl(param[1]))
+                return
             button = QMessageBox.warning(self, "提示", "是否前去查看?", QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Ok)
             if button == QMessageBox.Ok:  # 如果确定，就打开网页
-                param = item.text(2).split("|")
                 QtGui.QDesktopServices.openUrl(QtCore.QUrl(param[1]))
                 # 发起一个Http请求告知后端该消息已被查看
-                try:
-                    result = update_msg_read(param[0])
-                    print(result)
-                except:
-                    pass
+                if param is not None and param[2] == "WAITTING_READ":
+                    try:
+                        result = update_msg_read(param[0])
+                        print(result)
+                    except:
+                        pass
 
     def showEvent(self, *args, **kwargs):
         """
@@ -229,7 +238,7 @@ class ClientForm(QMainWindow):
         if self.init == 0:  # 初次加载
             print("show...")
             self.do_fetch_data()
-            self.lbl_usrname.setText("%s, %s好" % (self.cur_user_t[1], "下午"))
+            self.lbl_usrname.setText("%s, %s好" % (self.cur_user_t[1], MyDateInfoHelper.getTimeRange()))
             self.init += 1  # 累加
             # 建立socket连接,开启新线程自动刷新列表
             ChatNamespace.ContainerWidget = self.msglist_widget
@@ -266,11 +275,16 @@ class ClientForm(QMainWindow):
                 for msg in msg_list:
                     # 将该系统下的所有的消息加载到节点上
                     if msg.get("from_sys") == sys.get("id"):
+                        status = msg.get("msg_status")
                         sec_child = QTreeWidgetItem(child)
+                        # sec_child.setToolTip("")
                         sec_child.setText(0, msg.get("msg_title"))
                         sec_child.setText(1, msg.get("msg_push_time"))
-                        sec_child.setText(2, str(msg.get("id")) + "|" + str(msg.get("msg_url")))
-                        sec_child.setIcon(0, QIcon("static/xx.png"))
+                        sec_child.setText(2, str(msg.get("id")) + "|" + str(msg.get("msg_url")) + "|" + status)
+                        if status == "WAITTING_READ":
+                            sec_child.setIcon(0, QIcon("static/msg_alert.png"))
+                        else:
+                            sec_child.setIcon(0, QIcon("static/xx.png"))
         except Exception as e:
             print("解析异常")
 

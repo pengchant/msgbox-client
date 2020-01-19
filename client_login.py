@@ -1,4 +1,8 @@
+import os
 import sys
+
+if hasattr(sys, 'frozen'):
+    os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QFont, QIcon

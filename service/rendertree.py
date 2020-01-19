@@ -22,11 +22,19 @@ class ChatNamespace(BaseNamespace):
         self.emit('connect_event', {"workerid": ChatNamespace.WORKER_ID})
 
     def on_server_response(self, *args):
-        """服务器返回的消息"""
+        """
+        服务器返回的消息
+        :param args:
+        :return:
+        """
         print("服务器返回...", args)
 
     def on_push_message(self, *args):
-        """服务器推送的消息 [单个消息]"""
+        """
+        服务器推送的消息 [单个消息]
+        :param args:
+        :return:
+        """
         print("来自服务器的消息(单个)-->", args)
         msgid = args[0].get("msg_id")
         url = BasesConfig.REMOTE_URL_BASE + BasesConfig.API_V + "/client_update_msg"
@@ -39,7 +47,11 @@ class ChatNamespace(BaseNamespace):
         ChatNamespace.RENDER_THREAD.breakSignal.emit(result)  # 通知主线程修改ui
 
     def on_init_response(self, *args):
-        """接收到系统推送的消息 [多个消息]"""
+        """
+        接收到系统推送的消息 [多个消息]
+        :param args:
+        :return:
+        """
         print("接收到系统推送的消息(多个)-->", args)
         url = BasesConfig.REMOTE_URL_BASE + BasesConfig.API_V + "/client_update_msg"
         msglist = [v['id'] for v in args[0]['data']]
